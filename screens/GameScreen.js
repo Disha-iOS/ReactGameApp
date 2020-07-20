@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, {useState, useRef, useEffect} from 'react';
-import {View, StyleSheet, Text, Button, Alert, ScrollView, FlatList} from 'react-native';
+import {View, StyleSheet, Text, Button, Alert, ScrollView, FlatList, Dimensions} from 'react-native';
 import Card from '../components/Card';
 import CustomButton from '../components/CustomButton';
 
@@ -29,6 +29,8 @@ const GameScreen = (props) => {
   const number = generateRandomNumber(1,100,props.userChoice);
   const [pastGuesses, setPastGuesses] = useState([number.toString()]);
   const [currentGuess, setCurrentGuess] = useState(number);
+  const [deviceWidth, setDeviceWidth] = useState(Dimensions.get('window').width);
+  const [deviceHeight, setDeviceHeight] = useState(Dimensions.get('window').height);
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
@@ -60,14 +62,39 @@ const GameScreen = (props) => {
   };
 
   useEffect(() => {
+    const updateLayout = () => {
+      setDeviceWidth(Dimensions.get('window').width);
+      setDeviceHeight(Dimensions.get('window').height);
+    };
+    Dimensions.addEventListener('change',updateLayout);
+    return () => {
+      Dimensions.removeEventListener('change',updateLayout);
+    }
+  });
+
+  useEffect(() => {
     if (currentGuess === userChoice){
         onGameOver(pastGuesses.length);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentGuess, userChoice, onGameOver]);
 
-  return (
-    <View style={styles.screen}>
+  if (deviceHeight < 500) {
+    return(
+      <View style={styles.screen}>
+        <View style={styles.controls}>
+          <CustomButton onPress={nextGuessHandler.bind(this,'lower')}>Lower</CustomButton>
+          <Text>Chosen Number: {currentGuess}</Text>
+          <CustomButton onPress={nextGuessHandler.bind(this,'higher')}>Higher</CustomButton>
+        </View>
+      <View style={styles.listContainer}>
+        <FlatList keyExtractor={(item) => item} data={pastGuesses} renderItem={renderListItem.bind(this,pastGuesses.length)} contentContainerStyle={styles.list} />
+      </View>
+    </View>
+    );
+  } else {
+    return (
+      <View style={styles.screen}>
       <Text>Chosen Number: {currentGuess}</Text>
       <Card style={styles.buttonContainer}>
         <CustomButton onPress={nextGuessHandler.bind(this,'lower')}>Lower</CustomButton>
@@ -77,7 +104,10 @@ const GameScreen = (props) => {
         <FlatList keyExtractor={(item) => item} data={pastGuesses} renderItem={renderListItem.bind(this,pastGuesses.length)} contentContainerStyle={styles.list} />
       </View>
     </View>
-  );
+    );
+  }
+
+  
 };
 
 const styles = StyleSheet.create({
@@ -86,16 +116,22 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
   },
+  controls: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      width: '80%',
+      alignItems: 'center',
+  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
+    marginTop: Dimensions.get('window').height > 600 ? 20 : 10,
     width: 400,
     maxWidth: '100%',
   },
   listContainer: {
     flex: 1,
-    width: '60%',
+    width: Dimensions.get('window').width > 350 ? '60%': '80%',
   },
   list: {
     flexGrow: 1,
