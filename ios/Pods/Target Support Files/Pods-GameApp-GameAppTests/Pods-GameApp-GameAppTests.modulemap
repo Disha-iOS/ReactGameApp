@@ -1,0 +1,6 @@
+module Pods_GameApp_GameAppTests {
+  umbrella header "Pods-GameApp-GameAppTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
