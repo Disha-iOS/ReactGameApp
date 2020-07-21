@@ -45,11 +45,12 @@ const StartGameScreen = (props) => {
 
   const confirmInputHandler = () => {
     const choosenNumber = parseInt(enteredValue);
-    // eslint-disable-next-line use-isnan
-    if (isNaN(choosenNumber) || choosenNumber <= 0) {
-      Alert.alert('Invalid Number', 'number has to be between 1 to 99', [
-        {text: 'Okay', style: 'destructive', onPress: resetInputHandler},
-      ]);
+    if (isNaN(choosenNumber) || choosenNumber <= 0 || choosenNumber > 99) {
+      Alert.alert(
+        'Invalid number!',
+        'Number has to be a number between 1 and 99.',
+        [{ text: 'Okay', style: 'destructive', onPress: resetInputHandler }]
+      );
       return;
     }
     setConfirmed(true);
@@ -71,8 +72,8 @@ const StartGameScreen = (props) => {
   }
 
   return (
-    <ScrollView>
-      <KeyboardAvoidingView behavior="padding">
+    // <ScrollView>
+    //  <KeyboardAvoidingView enabled='false'>
     <TouchableWithoutFeedback
       onPress={() => {
         Keyboard.dismiss();
@@ -111,8 +112,8 @@ const StartGameScreen = (props) => {
         {confirmedOutput}
       </View>
     </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-    </ScrollView>
+  //   {/* </KeyboardAvoidingView>
+  // </ScrollView> */}
   );
 };
 
